@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── Auth.js Models ──────────────────────────────────────────────
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── User ────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          String    @default("EDITOR") // ADMIN, EDITOR
+
+  accounts      Account[]
+  sessions      Session[]
+  olympiads     Olympiad[]
+}
+
+// ─── Organizer ───────────────────────────────────────────────────
+
+model Organizer {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  type        String     @default("JINE") // OSOBA, SKOLA, NEZISKOVKA, UNIVERZITA, FIRMA, JINE
+  address     String?
+  website     String?
+  email       String?
+  phone       String?
+  description String?
+
+  olympiads   Olympiad[]
+}
+
+// ─── Olympiad (Competition) ──────────────────────────────────────
+
+model Olympiad {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  description     String?   // short annotation / perex
+  content         String?   // rich text HTML — rules, detailed info
+
+  // Edition & classification
+  edition         Int?      // rocnik (e.g. 62)
+  schoolYear      String?   // e.g. "2025/2026"
+  competitionType String?   // oborova, projektova, umelecka, sportovni...
+  targetAudience  String?   // e.g. "ZS", "SS", "ZS+SS"
+
+  // Round dates (Czech text format — e.g. "unor 2026")
+  districtRoundDate   String?
+  regionalRoundDate   String?
+  nationalRoundDate   String?
+  internationalRound  Boolean   @default(false)
+
+  // Location
+  locationName    String?
+  locationAddress String?
+
+  // Contact person
+  contactPerson   String?
+  contactEmail    String?
+  contactPhone    String?
+  workplaceName   String?
+  workplaceAddress String?
+
+  // Web & links
+  website         String?
+  resultsUrl      String?
+  registrationUrl String?
+
+  // Media
+  coverImage      String?
+
+  // Status
+  eventStatus     String    @default("NADCHAZEJICI") // NADCHAZEJICI, PROBIHAJICI, DOKONCENA, ZRUSENA
+  publishStatus   String    @default("DRAFT")        // DRAFT, PUBLISHED
+
+  // MSMT flags
+  msmtSupported   Boolean   @default(false)
+  rvpDescription  String?
+
+  // Dates
+  publishDate          DateTime?
+  registrationDeadline DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  // Relations
+  authorId        String
+  author          User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  organizerId     String?
+  organizer       Organizer? @relation(fields: [organizerId], references: [id], onDelete: SetNull)
+
+  categories      Category[]
+  media           Media[]
+}
+
+// ─── Category ────────────────────────────────────────────────────
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+
+  olympiads   Olympiad[]
+}
+
+// ─── Media ───────────────────────────────────────────────────────
+
+model Media {
+  id          String    @id @default(cuid())
+  url         String
+  name        String?
+  fileType    String    // IMAGE, PDF, LINK, OTHER
+  purpose     String    // COVER, GALLERY, RESULT, ATTACHMENT
+  sizeBytes   Int?
+  createdAt   DateTime  @default(now())
+
+  olympiadId  String
+  olympiad    Olympiad  @relation(fields: [olympiadId], references: [id], onDelete: Cascade)
+}
