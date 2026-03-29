@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { EventStatusBadge } from '@/components/ui/StatusBadge';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const [totalCount, categoryCount, organizerCount, upcoming] = await Promise.all([
     prisma.olympiad.count({ where: { publishStatus: 'PUBLISHED' } }),
