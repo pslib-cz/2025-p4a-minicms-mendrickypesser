@@ -71,7 +71,7 @@ export default async function UsersManagementPage() {
                       </div>
                     </div>
                   </td>
-                  <td>{user.email}</td>
+                  <td>{user.email || <span className="text-danger small fw-bold">Email nenalezen (GitHub)</span>}</td>
                   <td>
                     <span className={`badge ${
                       user.role === 'ADMIN' ? 'bg-danger' : 

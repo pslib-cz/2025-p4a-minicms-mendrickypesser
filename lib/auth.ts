@@ -46,11 +46,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt"
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
-        // On initial sign-in, attach role from DB user
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
+        // Find user by ID or Email
+        const dbUser = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { id: user.id },
+              { email: user.email }
+            ]
+          },
           select: { role: true, id: true },
         })
         if (dbUser) {
