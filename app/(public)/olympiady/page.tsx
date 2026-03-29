@@ -82,7 +82,7 @@ export default async function PublicOlympiadsPage({ searchParams }: { searchPara
   ]);
 
   const totalPages = Math.ceil(totalCount / take);
-  const types = competitionTypes.map(t => t.competitionType).filter(Boolean) as string[];
+  const types = competitionTypes.map((t: any) => t.competitionType).filter(Boolean) as string[];
 
   const getViewUrl = (view: string) => {
     const p = new URLSearchParams();
@@ -182,7 +182,7 @@ export default async function PublicOlympiadsPage({ searchParams }: { searchPara
               </tr>
             </thead>
             <tbody>
-              {olympiads.map(ol => (
+              {olympiads.map((ol: any) => (
                 <tr key={ol.id}>
                   <td>
                     <Link href={`/olympiady/${ol.slug}`} className="text-decoration-none fw-bold" style={{ color: 'var(--text-dark)' }}>
@@ -195,7 +195,7 @@ export default async function PublicOlympiadsPage({ searchParams }: { searchPara
                   <td className="small">{ol.organizer?.name || '-'}</td>
                   <td>
                     <div className="d-flex gap-1 flex-wrap">
-                      {ol.categories.slice(0, 2).map(c => (
+                      {ol.categories.slice(0, 2).map((c: any) => (
                         <Badge key={c.id} bg="primary" className="small">{c.name}</Badge>
                       ))}
                     </div>

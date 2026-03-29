@@ -39,7 +39,7 @@ export default async function DashboardOverview() {
           { label: 'Nadchazejici', value: upcoming, color: '#0d6efd' },
           { label: 'Dokoncene', value: completed, color: '#6c757d' },
           { label: 'Zrusene', value: cancelled, color: '#dc3545' },
-        ].map(stat => (
+        ].map((stat: any) => (
           <div key={stat.label} className="col-6 col-md-4 col-lg-2">
             <div className="stats-card">
               <div className="stats-number" style={{ color: stat.color }}>{stat.value}</div>
@@ -78,7 +78,7 @@ export default async function DashboardOverview() {
                 </tr>
               </thead>
               <tbody>
-                {recent.map(ol => (
+                {recent.map((ol: any) => (
                   <tr key={ol.id}>
                     <td className="fw-bold">{ol.title}</td>
                     <td><EventStatusBadge status={ol.eventStatus} /></td>

@@ -73,8 +73,8 @@ export default async function OlympiadDetailPage({ params }: Props) {
           </div>
           <h1 className="fw-bold mb-2" style={{ fontSize: '2rem' }}>{olympiad.title}</h1>
           <div className="d-flex flex-wrap gap-2 mb-3">
-            {olympiad.categories.map(c => (
-              <Badge key={c.id} className="bg-primary px-3 py-2">{c.name}</Badge>
+            {olympiad.categories.map((c: any) => (
+              <Badge key={c.id} bg="primary" className="me-2">{c.name}</Badge>
             ))}
           </div>
           <div className="text-muted">

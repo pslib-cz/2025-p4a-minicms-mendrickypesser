@@ -53,8 +53,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Container fluid className="flex-grow-1 d-flex p-0">
         <Row className="flex-grow-1 m-0 w-100">
           <Col md={3} lg={2} className="pt-4 px-2 border-end sidebar-nav">
-            <Nav className="flex-column" variant="pills">
-              {navItems.map(item => (
+            <Nav className="flex-column gap-1 w-100 px-3">
+              {navItems.map((item: any) => (
                 <Nav.Link
                   key={item.href}
                   as={Link}

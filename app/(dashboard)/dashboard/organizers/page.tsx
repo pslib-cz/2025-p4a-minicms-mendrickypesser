@@ -41,7 +41,7 @@ export default async function OrganizersPage() {
                   <td colSpan={7} className="text-center text-muted py-4">Zadni organizatori.</td>
                 </tr>
               ) : (
-                organizers.map(org => (
+                organizers.map((org: any) => (
                   <tr key={org.id}>
                     <td className="fw-bold">{org.name}</td>
                     <td><Badge className="bg-secondary">{org.type}</Badge></td>
