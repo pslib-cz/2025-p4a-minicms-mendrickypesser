@@ -18,9 +18,22 @@ function generateSlug(title: string): string {
 
 async function requireUser() {
   const session = await auth();
-  if (!session?.user?.email) throw new Error('Nejste prihlaseni.');
+  if (!session?.user?.email) throw new Error('Nejste přihlášeni.');
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user) throw new Error('Uzivatel nebyl nalezen.');
+  if (!user) throw new Error('Uživatel nebyl nalezen.');
+  
+  if (user.role === 'USER') {
+    throw new Error('Nedostatečná oprávnění. Váš účet čeká na schválení role EDITOR.');
+  }
+  
+  return user;
+}
+
+async function requireAdmin() {
+  const user = await requireUser();
+  if (user.role !== 'ADMIN') {
+    throw new Error('Tato akce vyžaduje roli ADMIN.');
+  }
   return user;
 }
 

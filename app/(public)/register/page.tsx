@@ -6,33 +6,62 @@ import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleCredentialsSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Hesla se neshodují.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Heslo musí mít alespoň 6 znaků.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await signIn('credentials', {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Došlo k chybě při registraci.');
+        setLoading(false);
+        return;
+      }
+
+      // Auto-login after successful registration
+      const signInRes = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
 
-      if (res?.error) {
-        setError('Neplatný e-mail nebo heslo.');
-      } else {
-        router.push('/dashboard');
+      if (signInRes?.error) {
+        setError('Registrace proběhla, ale přihlášení selhalo. Zkuste se přihlásit ručně.');
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      setError('Došlo k chybě při přihlašování.');
-    } finally {
+
+      router.push('/dashboard');
+    } catch {
+      setError('Došlo k chybě při registraci.');
       setLoading(false);
     }
   };
@@ -42,11 +71,21 @@ export default function LoginPage() {
       <Row className="justify-content-center">
         <Col xs={12} md={6} lg={4}>
           <div className="card-custom p-4">
-            <h2 className="text-center mb-4">Přihlášení</h2>
-            
+            <h2 className="text-center mb-4">Registrace</h2>
+
             {error && <Alert variant="danger">{error}</Alert>}
 
-            <Form onSubmit={handleCredentialsSubmit}>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="name">
+                <Form.Label>Jméno</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jan Novák"
+                />
+              </Form.Group>
+
               <Form.Group className="mb-3" controlId="email">
                 <Form.Label>E-mail</Form.Label>
                 <Form.Control
@@ -64,7 +103,18 @@ export default function LoginPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="********"
+                  placeholder="Alespoň 6 znaků"
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3" controlId="confirmPassword">
+                <Form.Label>Potvrzení hesla</Form.Label>
+                <Form.Control
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Zopakujte heslo"
                   required
                 />
               </Form.Group>
@@ -75,7 +125,7 @@ export default function LoginPage() {
                 className="w-100 mb-3"
                 disabled={loading}
               >
-                {loading ? 'Přihlašování...' : 'Přihlásit se pomocí e-mailu'}
+                {loading ? 'Registrace...' : 'Zaregistrovat se'}
               </Button>
             </Form>
 
@@ -90,7 +140,7 @@ export default function LoginPage() {
               className="w-100 mb-2"
               onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
             >
-              Přihlásit se přes GitHub
+              Registrovat přes GitHub
             </Button>
 
             <Button
@@ -98,14 +148,14 @@ export default function LoginPage() {
               className="w-100 mb-3"
               onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             >
-              Přihlásit se přes Google
+              Registrovat přes Google
             </Button>
 
-            <div className="text-center mt-3">
+            <div className="text-center">
               <small className="text-muted">
-                Nemáte účet?{' '}
-                <Link href="/register" className="text-primary fw-bold">
-                  Zaregistrujte se
+                Už máte účet?{' '}
+                <Link href="/login" className="text-primary">
+                  Přihlaste se
                 </Link>
               </small>
             </div>

@@ -8,7 +8,7 @@ export default async function EditOlympiadPage({ params }: { params: Promise<{ i
   if (!session?.user?.email) redirect('/login');
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user) redirect('/login');
+  if (!user || user.role === 'USER') redirect('/dashboard');
 
   const { id } = await params;
 

@@ -8,6 +8,9 @@ export default async function OrganizersPage() {
   const session = await auth();
   if (!session?.user?.email) redirect('/login');
 
+  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+  if (!user || user.role === 'USER') redirect('/dashboard');
+
   const organizers = await prisma.organizer.findMany({
     orderBy: { name: 'asc' },
     include: {

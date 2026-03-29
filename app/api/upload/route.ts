@@ -3,8 +3,25 @@ import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Neautorizováno' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({ 
+      where: { email: session.user.email },
+      select: { role: true }
+    });
+
+    if (!user || user.role === 'USER') {
+      return NextResponse.json({ error: 'Nedostatečná oprávnění' }, { status: 403 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 

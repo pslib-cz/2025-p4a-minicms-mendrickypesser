@@ -11,7 +11,7 @@ export default async function OlympiadsListPage() {
   if (!session?.user?.email) redirect('/login');
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user) redirect('/login');
+  if (!user || user.role === 'USER') redirect('/dashboard');
 
   const olympiads = await prisma.olympiad.findMany({
     where: { authorId: user.id },

@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Komplexni system pro spravu a katalog skolnich soutezi, olympiad a akademickych klani. Propozice, terminy, vysledky a kontakty na jednom miste.",
 };
 
+import { Providers } from '@/components/Providers';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,7 +56,9 @@ export default function RootLayout({
 {/* Microsoft Clarity should only be loaded after consent in CookieConsent component */}
       </head>
       <body className="min-vh-100 d-flex flex-column">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <CookieConsent />
       </body>
     </html>
