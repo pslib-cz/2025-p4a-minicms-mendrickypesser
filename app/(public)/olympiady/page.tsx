@@ -15,6 +15,28 @@ type SearchParams = {
   page?: string;
 };
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
+  const params = await searchParams;
+  const hasFilters = params.q || params.category || params.eventStatus || params.type || params.international === '1';
+  const page = parseInt(params.page || '1', 10);
+  
+  if (hasFilters || page > 1) {
+    return {
+      title: 'Vyhledavani - Souteze a olympiady',
+      robots: {
+        index: false,
+        follow: true,
+      }
+    };
+  }
+  return {
+    title: 'Katalog soutezi a olympiad',
+    description: 'Prehled aktualnich soutezi a olympiad.',
+  };
+}
+
 export default async function PublicOlympiadsPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
   const isList = params.view === 'list';

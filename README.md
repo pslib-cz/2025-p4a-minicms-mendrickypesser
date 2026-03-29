@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OlympCMS - Publikační systém pro olympiády
 
-## Getting Started
+Tento projekt je plnohodnotná publikační webová aplikace demonstrující široké možnosti frameworku **Next.js (App Router)**. Aplikace primárně slouží pro správu, prezentaci a katalogizaci školních ročníků, soutěží a olympiád z pohledu jednotlivých autorů/zástupců ročníků.
 
-First, run the development server:
+## Popis aplikace
+Aplikace se dělí na tři logické části:
+1. **Veřejná část:** Katalog s dynamickým listováním s možností filtrování, stránkování a detailním panelem k dané olympiádě.
+2. **Dashboard:** Zabezpečená interní sekce postavená na React Bootstrapu určená pro administrátory k přidávání a editaci olympiád. Obsahuje rovněž TipTap editor.
+3. **API (Akce, Route Handlery):** Skrze `server actions` probíhá zabezpečená práce a úprava konkrétních olympiád. O testy a autentizaci se stará moderní **NextAuth** (Auth.js) v kombinaci s Prismou.
 
+## Datový model
+Celý datový model běží nad knihovnou Prisma ORM. Oproti klasickým blogům je uzpůsoben pro specifické ročníky soutěží:
+
+- **Auth blok (`User`, `Account`, `Session`)**: Standardní Auth.js model pro uživatele a oAuth přihlášení.
+- **Olympiad (`Olympiad`)**: Hlavní tabulka pro publikovaný článek/ročník olympiády, je zde spoustu specializovaných kolonek pro kontakty a termíny okrskových a krajských kol.
+- **Category (`Category`)**: Kategorie umožňující štítkování. (Vazba mezi Olympiad.categories a kategorií představuje vyžadovanou vazbu **N:M**).
+- **Organizer (`Organizer`)**: Předkládá informace o tom, kdo soutěž zastřešuje.
+- **Media (`Media`)**: Tabulka pro obrázky, blob média a PDF obálky (zastupuje vazbu **1:N** s tabulkou Olympiad).
+
+## Seznam funkcí
+- Zabezpečené přihlášení přes e-mail/OAuth (NextAuth.js).
+- Možnost vkládat, mazat, editovat a provádět "Drafting" u vlastní ročníkové práce skrze dashboard pro administrátory.
+- Stránkované, vyhledávatelné a libovolně filtrovatelné seznamy článků s parametry URL pro public space.
+- Vercel Blob file systém pro vkládání a odeslání binárních fotek a dokumentů ze stránek do cloudu.
+- Detailní SEO meta data s kanonizací rout. Zajištěné generování robotích konfiguračních souborů `robots.ts` a `sitemap.ts`.
+
+## Návod ke spuštění 
+
+**1. Potřebné závislosti a stažení repozitáře:**  
+Vložte příkaz pro instalaci všech modulů ve vývojářské složce.  
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**2. Příprava databáze (.env nastavení)**  
+Pro spuštění SQLite nebo PostgreSQL si musíte připravit prostředí.  
+Vytvořte soubor `.env` postavený primárně podle přiloženého vzoru `cp .env.example .env`. Pro lokální chod Vám postačí zakomentovaný příklad.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**3. Nasazení Tabulek, Inicializace a Spuštění seed.**  
+Vygenerujete prázdné tabulky a nasypete demo data z `seed.ts`, což za vás vyhotoví tento spojený příkaz:  
+```bash
+npx prisma migrate dev --name init
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**4. Start Vývoje**  
+A to je vše! Spustěte lokální vývoj webového serveru portu `3000`.  
+```bash
+npm run dev
+```

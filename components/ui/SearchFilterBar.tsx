@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Form, Row, Col, Button } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import { Form, Row, Col, Button, Spinner } from 'react-bootstrap';
+import { useState, useTransition } from 'react';
 
 type Category = { id: string; name: string; slug: string };
 
@@ -27,6 +27,7 @@ export default function SearchFilterBar({ categories, competitionTypes = [], sho
   const [localEventStatus, setLocalEventStatus] = useState(eventStatus);
   const [localCompType, setLocalCompType] = useState(compType);
   const [localIntl, setLocalIntl] = useState(intl);
+  const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +39,9 @@ export default function SearchFilterBar({ categories, competitionTypes = [], sho
     if (localIntl) params.set('international', '1');
     const view = searchParams.get('view');
     if (view) params.set('view', view);
-    router.push(`/olympiady?${params.toString()}`);
+    startTransition(() => {
+      router.push(`/olympiady?${params.toString()}`);
+    });
   };
 
   const handleClear = () => {
@@ -48,7 +51,9 @@ export default function SearchFilterBar({ categories, competitionTypes = [], sho
     setLocalCompType('');
     setLocalIntl(false);
     const view = searchParams.get('view');
-    router.push(view ? `/olympiady?view=${view}` : '/olympiady');
+    startTransition(() => {
+      router.push(view ? `/olympiady?view=${view}` : '/olympiady');
+    });
   };
 
   return (
@@ -103,8 +108,10 @@ export default function SearchFilterBar({ categories, competitionTypes = [], sho
             />
           </Col>
           <Col md="auto" className="d-flex gap-2">
-            <Button type="submit" variant="primary" size="sm">Filtrovat</Button>
-            <Button type="button" variant="outline-secondary" size="sm" onClick={handleClear}>Zrusit</Button>
+            <Button type="submit" variant="primary" size="sm" disabled={isPending}>
+              {isPending ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Filtrovat'}
+            </Button>
+            <Button type="button" variant="outline-secondary" size="sm" onClick={handleClear} disabled={isPending}>Zrusit</Button>
           </Col>
         </Row>
       </Form>

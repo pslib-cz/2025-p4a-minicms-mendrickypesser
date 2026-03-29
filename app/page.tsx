@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { EventStatusBadge } from '@/components/ui/StatusBadge';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default async function Home() {
   const [totalCount, categoryCount, organizerCount, upcoming] = await Promise.all([
@@ -20,6 +21,9 @@ export default async function Home() {
 
   return (
     <>
+      <div className="position-absolute top-0 end-0 p-3 p-md-4 z-3">
+        <ThemeToggle className="btn-sm btn-outline-light" />
+      </div>
       {/* Hero */}
       <section className="hero-section">
         <div className="container">

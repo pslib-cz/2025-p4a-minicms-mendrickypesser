@@ -398,16 +398,16 @@
   transition: all 0.2s ease;
 }
 
-/* Smooth scrollbar for dark mode */
-[data-bs-theme="dark"] ::-webkit-scrollbar {
+/* Smooth scrollbar pro obe temata aby neposkakoval layout */
+::-webkit-scrollbar {
   width: 8px;
 }
 
-[data-bs-theme="dark"] ::-webkit-scrollbar-track {
-  background: #141820;
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
 }
 
-[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: #2d333b;
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
   border-radius: 4px;
 }
