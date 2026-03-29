@@ -1,4 +1,5 @@
 # OlympCMS - Publikační systém pro olympiády
+## https://2025-p4a-minicms-mendrickypesser-fo.vercel.app/
 
 Tento projekt je plnohodnotná publikační webová aplikace demonstrující široké možnosti frameworku **Next.js (App Router)**. Aplikace primárně slouží pro správu, prezentaci a katalogizaci školních ročníků, soutěží a olympiád z pohledu jednotlivých autorů/zástupců ročníků.
 
