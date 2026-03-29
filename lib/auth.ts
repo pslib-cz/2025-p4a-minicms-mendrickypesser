@@ -20,7 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null
         }
-        
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string }
         })
@@ -46,22 +46,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt"
   },
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user }) {
       if (user) {
-        // Find user by ID or Email
-        const dbUser = await prisma.user.findFirst({
-          where: {
-            OR: [
-              { id: user.id },
-              { email: user.email }
-            ]
-          },
-          select: { role: true, id: true },
-        })
-        if (dbUser) {
-          token.role = dbUser.role
-          token.userId = dbUser.id
-        }
+        // user object is available during sign-in
+        // It's either a new user created by adapter or existing user fetched by adapter
+        token.role = (user as any).role || 'USER'
+        token.userId = user.id
       }
       return token
     },

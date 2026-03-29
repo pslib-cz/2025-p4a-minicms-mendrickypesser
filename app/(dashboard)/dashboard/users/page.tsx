@@ -65,13 +65,24 @@ export default async function UsersManagementPage() {
                           {user.name?.[0] || user.email?.[0] || '?'}
                         </div>
                       )}
+                    </div>
                       <div>
-                        <div className="fw-bold">{user.name || 'Nepojmenovaný'}</div>
-                        <div className="small text-muted">{user.id}</div>
+                      <div className="fw-bold fs-5">
+                        {user.name || 'Uživatel bez jména'} 
+                        {user.id === session?.user?.id && (
+                          <span className="badge bg-primary ms-2 animate-pulse">TO JSTE VY</span>
+                        )}
+                      </div>
+                      <div className="text-muted small font-monospace" style={{ fontSize: '0.75rem' }}>
+                        ID: {user.id}
                       </div>
                     </div>
                   </td>
-                  <td>{user.email || <span className="text-danger small fw-bold">Email nenalezen (GitHub)</span>}</td>
+                  <td>
+                    <div className="d-flex flex-column">
+                      <span className="fw-bold text-dark">{user.email || 'Email nenalezen'}</span>
+                    </div>
+                  </td>
                   <td>
                     <span className={`badge ${
                       user.role === 'ADMIN' ? 'bg-danger' : 
