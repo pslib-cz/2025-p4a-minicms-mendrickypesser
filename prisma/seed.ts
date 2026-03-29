@@ -149,7 +149,16 @@ async function main() {
   }
 
   // 3. Parse CSV
-  const csvPath = join(__dirname, "..", "nformativni_seznam_soutezi_MSMT_pro_skolni_rok_2025_2026_3_a(List1).csv")
+  const csvPath = join(process.cwd(), "nformativni_seznam_soutezi_MSMT_pro_skolni_rok_2025_2026_3_a(List1).csv")
+  
+  try {
+    if (!readFileSync(csvPath)) throw new Error("CSV file not found")
+  } catch (e) {
+    console.error(" Kritická chyba: CSV soubor s daty nebyl nalezen v rootu projektu!")
+    console.log("Cesta:", csvPath)
+    process.exit(1)
+  }
+
   const rows = parseCsv(csvPath)
   console.log(`Parsed ${rows.length} competitions from CSV`)
 
@@ -219,8 +228,38 @@ async function main() {
       .map(n => ({ id: categoryMap[n] }))
 
     try {
-      await prisma.olympiad.create({
-        data: {
+      await prisma.olympiad.upsert({
+        where: { slug },
+        update: {
+          title,
+          description: description.substring(0, 500) || null,
+          content: description || null,
+          edition,
+          schoolYear: "2025/2026",
+          competitionType,
+          districtRoundDate,
+          regionalRoundDate,
+          nationalRoundDate,
+          internationalRound,
+          contactPerson,
+          contactEmail,
+          contactPhone,
+          workplaceName,
+          workplaceAddress,
+          website,
+          msmtSupported,
+          rvpDescription,
+          eventStatus: "NADCHAZEJICI",
+          publishStatus: "PUBLISHED",
+          authorId: admin.id,
+          organizerId: orgName && organizerMap[orgName] ? organizerMap[orgName] : null,
+          categories: {
+            set: categoryConnections.length > 0
+              ? categoryConnections
+              : [{ id: categoryMap["Ostatní"] }],
+          },
+        },
+        create: {
           title,
           slug,
           description: description.substring(0, 500) || null,
@@ -253,7 +292,7 @@ async function main() {
       })
       created++
     } catch (e: any) {
-      console.error(`Failed to create: ${title} — ${e.message}`)
+      console.error(`Failed to handle: ${title} — ${e.message}`)
     }
   }
 
